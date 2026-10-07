@@ -1,0 +1,22 @@
+# kart_map2d - OPTIONAL neural segmentation backend (SegFormer-B0), only for
+# [segmentation] mode = neural. The default classical backend needs NOTHING
+# from this file and never imports torch.
+#
+# JETSON / ORIN: do NOT plain "pip install torch". PyPI's aarch64 torch is a
+# CPU-only build. Install the torch wheel NVIDIA publishes for your JetPack 6
+# release first (NVIDIA "PyTorch for Jetson" wheels), verify with
+#   python3 -c "import torch; print(torch.__version__, torch.cuda.is_available())"
+# (must print True), and only then run
+#   python3 -m pip install --user -r orin-neural.txt
+# If pip starts downloading torch, STOP - the NVIDIA wheel is missing or too
+# old. The torch build must work with numpy 1.x (orin-base.txt).
+#
+# Model weights (~15 MB) load from outputs/cache/models/segformer-b0-...
+# when present, else download once from the Hugging Face hub - copy the
+# folder over for an offline kart (tools/upload_to_kart.py does this when
+# [segmentation] mode = neural).
+
+torch>=2.1
+transformers>=4.40
+huggingface_hub>=0.23
+safetensors>=0.4

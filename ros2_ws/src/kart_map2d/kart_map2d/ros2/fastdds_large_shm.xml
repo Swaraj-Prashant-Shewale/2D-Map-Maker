@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Fast DDS profile for the trackmapper live node and the camera driver.
+
+  The ZED topics carry 1920x1200 bgra8 images (9.2 MB each). Fast DDS's
+  default shared-memory segment is 0.5 MB, so such samples fall back to
+  fragmented UDP and, being best effort, are lost under load: in the
+  trackmapper:humble container a plain subscriber received 99-110 of the 195
+  sept3 frames that way; with this profile (64 MB segment) it received all
+  195 and `ros2 bag play` never starved.
+
+  Use it for EVERY process on the kart's image path (the camera driver or
+  ros2 bag play, and the node) - the writer allocates the buffers:
+      export FASTRTPS_DEFAULT_PROFILES_FILE=<bundle>/trackmapper/ros2/fastdds_large_shm.xml
+  /dev/shm must hold one segment per process (Linux default: half the RAM;
+  Docker's default of 64 MB is too small - run containers with --shm-size=1g).
+  UDPv4 stays enabled for discovery and for peers on other machines.
+-->
+<profiles xmlns="http://www.eprosima.com/XMLSchemas/fastRTPS_Profiles">
+  <transport_descriptors>
+    <transport_descriptor>
+      <transport_id>shm_large</transport_id>
+      <type>SHM</type>
+      <segment_size>67108864</segment_size>
+    </transport_descriptor>
+    <transport_descriptor>
+      <transport_id>udp</transport_id>
+      <type>UDPv4</type>
+    </transport_descriptor>
+  </transport_descriptors>
+  <participant profile_name="trackmapper_large_shm" is_default_profile="true">
+    <rtps>
+      <userTransports>
+        <transport_id>shm_large</transport_id>
+        <transport_id>udp</transport_id>
+      </userTransports>
+      <useBuiltinTransports>false</useBuiltinTransports>
+    </rtps>
+  </participant>
+</profiles>

@@ -1,0 +1,22 @@
+# kart_map2d drive node - plain YAML params (tests / parity runs).
+# NORMAL OPERATION USES kart_master.cfg (--cfg / drive.launch.py), not this.
+# Keys mirror kart_map2d.ros2.drive_node.DriveParams; omitted keys keep
+# defaults. The camera is deliberately GENERIC: any make, any topic.
+drive:
+  map_package: ""            # ABSOLUTE path to the folder holding map_meta.json
+  imu_topic: /imu/data
+  odom_topic: ""
+  lidar_topic: ""
+  max_speed_mps: 2.0         # SAFETY: cap; first tests on stands use 0.5
+  speed_scale: 1.0
+  control_rate_hz: 50.0
+  drive_topic: /drive
+  estop_topic: /estop
+  engage_on_start: false
+  cameras:
+    front:
+      image_topic: /camera/image_raw
+      info_topic: /camera/camera_info
+      mount_xyz: [0.0, 0.0, 0.5]
+      height_m: 0.5
+      image_scale: 0.5

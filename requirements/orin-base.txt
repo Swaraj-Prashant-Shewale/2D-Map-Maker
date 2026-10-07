@@ -1,0 +1,24 @@
+# kart_map2d - Orin (JetPack 6 = Ubuntu 22.04 = ROS 2 Humble, Python 3.10).
+# Install AFTER sourcing ROS 2:  python3 -m pip install --user -r orin-base.txt
+# ROS itself (rclpy, sensor_msgs, nav_msgs, geometry_msgs, std_msgs, std_srvs,
+# tf2_ros, ackermann_msgs) comes from apt with the ROS distribution - never pip.
+
+# numpy < 2 is REQUIRED under ROS 2 Humble: its compiled message bindings
+# (rosidl-generated C extensions used by rclpy) are built against numpy 1.x
+# and fail to import under numpy 2. The Orin has the same constraint.
+numpy>=1.24,<2
+
+# scipy: chi2 gates in the EKF, KD-tree LiDAR quality, loop-closure pose
+# graph, racing-line QP. <1.14 stays inside the numpy-1.x-built wheels.
+scipy>=1.10,<1.14
+
+# opencv (cv2): VO, image decode/resize, the classical segmenter, grid
+# rasterisation. HEADLESS: the kart has no GUI. <4.11: >=4.12 needs numpy 2.
+# NOTE gstreamer camera source: pip wheels have NO GStreamer support - for
+# [camera] source = gstreamer use apt python3-opencv instead (and do not
+# install this wheel, or it shadows the apt build). V4L2 / video-file capture
+# works with either build.
+opencv-python-headless>=4.8,<4.11
+
+# PyYAML: kart_master.cfg camera calibrations, params files.
+PyYAML>=6.0

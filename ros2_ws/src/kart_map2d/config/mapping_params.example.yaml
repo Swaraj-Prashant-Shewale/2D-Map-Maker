@@ -1,0 +1,26 @@
+# kart_map2d mapping node - plain YAML params (tests / parity runs).
+# NORMAL OPERATION USES kart_master.cfg (--cfg / the launch files), not this.
+# Keys mirror kart_map2d.ros2.node.NodeParams; omitted keys keep defaults.
+kart_map2d:
+  imu_topic: /imu/data
+  imu_rate_hz: 100.0
+  livox_imu_topic: ""        # dedicated IMU only by default
+  odom_topic: ""
+  lidar_topic: ""
+  seg_mode: classical
+  seg_period_s: 0.5
+  image_scale: 0.5
+  grid_cell_m: 0.15
+  output_dir: outputs/maps_live
+  map_name: live
+  save_on_shutdown: true
+  loop_closure: true
+  cameras:
+    camera:
+      source: ros2
+      image_topic: /zed_right/zed_lean_camera_node/rgb/image_rect_color
+      info_topic: /zed_right/zed_lean_camera_node/rgb/camera_info
+      mount_xyz: [-0.06, -0.27, 0.462]
+      mount_rpy_deg: [0.0, 0.0, 0.0]
+      height_m: 0.445
+      learn_mask: true

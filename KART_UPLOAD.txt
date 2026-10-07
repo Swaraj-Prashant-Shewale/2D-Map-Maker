@@ -1,0 +1,162 @@
+WHAT GOES ON THE KART, AND WHY
+==============================
+
+This file is the contract for tools/upload_to_kart.py. The tool copies ONLY
+the "+" entries below, adds the "~" entry only in neural mode, and REFUSES
+the "-" entries even when someone edits the allowlist by mistake (the run
+aborts before anything is copied). The pattern lines here and the
+ALLOWLIST / NEURAL_ALLOWLIST / NEVERLIST inside tools/upload_to_kart.py are
+the same list twice; tools/tests/test_upload_sync.py fails the suite the
+moment they disagree, so trust either one.
+
+Pattern language: an entry with "/" is relative to this project folder and
+"**" spans subfolders; an entry without "/" names a file or folder anywhere
+(so "*.md" means every Markdown file, wherever it hides).
+
+Target on the Orin: a SPACE-FREE path, default ~/kart_ws/src/kart_map2d.
+Colcon workspaces with spaces break tooling, which is why the Windows folder
+name "2d map maker" must never appear on the kart.
+
+UPLOAD (the "+" entries and why each ships)
+-------------------------------------------
+  + ros2_ws/src/kart_map2d/kart_map2d/**
+      The package source - everything the mapping node and the drive node
+      run. Torch-free by default (classical segmentation).
+  + ros2_ws/src/kart_map2d/launch/**
+      mapping/drive/replay launch files (the static base_link->imu_link TF
+      and the optional camera driver start live here).
+  + ros2_ws/src/kart_map2d/config/**
+      Example params files.
+  + ros2_ws/src/kart_map2d/package.xml
+      colcon build needs it.
+  + ros2_ws/src/kart_map2d/setup.py
+      colcon build needs it.
+  + ros2_ws/src/kart_map2d/setup.cfg
+      colcon build needs it.
+  + ros2_ws/src/kart_map2d/resource/**
+      The ament resource marker; colcon build needs it.
+  + ros2_ws/src/kart_map2d/conftest.py
+      pytest bootstrap so the on-device tests import the package.
+  + ros2_ws/src/kart_map2d/test/**
+      OPTIONAL (skip with --no-tests): run pytest once on the Orin after an
+      upload to prove the install works on the real JetPack stack.
+  + kart_master.cfg
+      THE control file. From now on the kart team edits this copy on the
+      kart; every sensor switch and safety knob lives in it.
+  + requirements/orin-base.txt
+      pip install list for the Orin (numpy<2, opencv, scipy, yaml).
+  + requirements/orin-neural.txt
+      Consulted ONLY if you switch [segmentation] mode to neural; documents
+      NVIDIA's JetPack 6 torch wheel.
+  + config/**
+      Site files kart_master.cfg points at, if you have made any:
+      magnetometer calibration YAML, camera calibration YAML, mask PNGs.
+
+UPLOAD ONLY IN NEURAL MODE (the "~" entry)
+------------------------------------------
+  ~ outputs/cache/models/**
+      SegFormer weights. Included only when you pass --neural or when
+      kart_master.cfg itself says [segmentation] mode = neural (so the kart
+      can never boot neural without its weights). With the default
+      classical mode nothing from outputs/ ever ships and torch is never
+      installed.
+
+NEVER UPLOAD (the "-" entries and why each stays)
+-------------------------------------------------
+  - inputs/**
+      PRIVACY. This is a junction into the 37 GB of track recordings, and
+      the recordings show identifiable people. They never leave the laptop,
+      they are never committed, and the uploader never even follows the
+      junction. The kart also has no use for them: it maps live.
+  - outputs/**
+      Laptop test artifacts: replay maps, caches, live-replay dumps. A
+      stale TEST map on the kart is a driving hazard (the drive stack could
+      localize against the wrong track). Only the models/ corner above is
+      carved out, and only in neural mode.
+  - results/**
+      Validation outputs: the sensor-matrix runs, drive-sim traces, latency
+      sweeps and the demo video. The video and the run packages derive from
+      recordings with identifiable people, and a validation map on the kart
+      is the same driving hazard as any stale test map. Laptop only.
+  - *.md
+      Explanation files stay on the laptop: README.md, design notes,
+      reports, the compliance audit. None of it helps the kart drive.
+  - *.html
+      The HTML guide stays on the laptop (same reason).
+  - docs/**
+      Documentation stays on the laptop.
+  - KART_UPLOAD.txt
+      This very file is laptop documentation too.
+  - tools/**
+      Laptop-side tooling: this uploader, the replay runner, the bag
+      exporter, the calibration helpers. They run on Windows against the
+      recordings; on the kart they would only confuse.
+  - .venv/**
+      The Windows virtualenv - useless and huge on aarch64.
+  - docker/**
+      The laptop test container. The Orin runs bare JetPack, no Docker.
+  - .git/**
+      Never ship history.
+  - .gitignore
+      Git plumbing.
+  - ros2_ws/build/**
+      colcon artifacts are rebuilt ON the kart, for the kart's CPU.
+  - ros2_ws/install/**
+      Same - rebuilt on the kart.
+  - ros2_ws/log/**
+      Same - build logs are per-machine.
+  - __pycache__
+      Bytecode is per-machine.
+  - *.pyc
+      Bytecode is per-machine.
+  - .pytest_cache
+      pytest cache junk.
+  - *.zip
+      No archives - and never the "Virtual map maker" research workspace
+      or any "sept data" snapshot.
+  - *.db3
+      Bag data (recordings) never ships, in any location.
+  - *.mcap
+      Bag data never ships.
+
+HOW TO RUN IT (from the project folder, Windows)
+------------------------------------------------
+See what would be uploaded (copies nothing, prints every file with sizes
+and the total):
+
+  .venv/Scripts/python.exe tools/upload_to_kart.py --host orin@EDIT-ME-ORIN-IP --dry-run
+
+Upload for real (EDIT the address to your Orin's user@address first; the
+placeholder is refused on purpose):
+
+  .venv/Scripts/python.exe tools/upload_to_kart.py --host orin@192.168.55.1
+
+Useful flags:
+  --neural        also upload the SegFormer weights (see the "~" entry)
+  --no-tests      skip the test/ folder (smaller upload)
+  --tar           one tarball instead of many small files (faster links)
+  --dest PATH     remote path, space-free (default kart_ws/src/kart_map2d)
+  --stage-to DIR  build the exact upload tree in DIR and stop (no ssh) -
+                  this is how the container proof simulates the Orin
+  --clean-dest    DELETE the remote dest first. Without this flag the
+                  uploader never deletes anything on the kart; it only
+                  copies over.
+
+Transport is Windows' built-in OpenSSH scp. If scp/ssh is missing the tool
+says so plainly (Settings > System > Optional features > OpenSSH Client)
+instead of tracebacking.
+
+AFTER THE UPLOAD (on the Orin)
+------------------------------
+  cd ~/kart_ws && source /opt/ros/humble/setup.bash
+  python3 -m pip install --user -r src/kart_map2d/requirements/orin-base.txt
+  colcon build --symlink-install --packages-select kart_map2d
+  source install/setup.bash
+  ros2 run kart_map2d check_cfg src/kart_map2d/kart_master.cfg   # sanity
+  # optional on-device verification:
+  python3 -m pytest src/kart_map2d/test -q -p no:cacheprovider
+  # (FIXED 2026-10-01: the former 3-test cfg-locator failure on the kart
+  # layout is gone - the tests now walk up from the test file until they
+  # find kart_master.cfg, so the full suite passes on both layouts;
+  # verified in the container on a staged upload set: 366 tests, 0 failures.)
+  ros2 launch kart_map2d mapping.launch.py cfg:=$HOME/kart_ws/src/kart_map2d/kart_master.cfg

@@ -1,0 +1,23 @@
+{
+  "_comment": [
+    "Recording-rig DATA for the existing September exports - not code, and",
+    "not a camera-make assumption (requirement 6): the keys are the",
+    "RECORDING's camera folder names as written by the bag exporter.",
+    "camera_heights_m: calibrated camera heights over ground [m] fitted",
+    "against the KISS-ICP scale on the September recordings (the monocular",
+    "scale anchor). A kart_master.cfg [camera] height_m always overrides.",
+    "camera_links: the September rigs' TF link names - a compatibility",
+    "fallback used only when a recording's camera_info.json carries no",
+    "'link' entry and no TF frame contains the camera name.",
+    "For a NEW camera nothing here is consulted: heights come from the cfg",
+    "(README.md 'Calibrating the camera height') and links from TF."
+  ],
+  "camera_heights_m": {
+    "zed_right": 0.445,
+    "zed_left": 0.545
+  },
+  "camera_links": {
+    "zed_left": "zedxgs_left_camera_link",
+    "zed_right": "zedxgs_right_camera_link"
+  }
+}

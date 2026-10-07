@@ -1,0 +1,14 @@
+# Python packages for kart_map2d inside the ROS 2 Humble container.
+# numpy stays below 2: Humble's compiled message bindings need numpy 1.x.
+numpy>=1.24,<2
+scipy>=1.10,<1.14
+opencv-python-headless>=4.8,<4.11
+PyYAML>=6.0
+# matplotlib: corridor/racing-line preview PNGs (and their tests). The Orin
+# itself does not need it (previews are skipped without it); the container
+# mirrors the research image so the full suite runs.
+matplotlib>=3.7,<3.10
+# rosbags: tools/export_bag.py + reading camera_info from bags on the laptop side.
+rosbags>=0.9
+# Humble's launch_testing pytest plugin uses a hook argument removed in pytest 8.
+pytest>=7.0,<8

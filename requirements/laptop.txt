@@ -1,0 +1,19 @@
+# kart_map2d - Windows/Linux dev laptop (tests + offline tools). NOT for the
+# kart (use orin-base.txt there). Version bounds are loose on purpose: the
+# suite is verified on numpy 1.26/opencv 4.10 (the Humble container) and on
+# newer numpy 2.x / opencv 5 stacks (the research laptop).
+
+numpy>=1.24
+scipy>=1.10
+opencv-python-headless>=4.8
+PyYAML>=6.0
+
+# pytest: the test suite (python -m pytest ros2_ws/src/kart_map2d/test -q).
+pytest>=7.0
+
+# rosbags: pure-Python rosbag2 reader for tools/export_bag.py (no ROS needed).
+rosbags>=0.9
+
+# matplotlib: optional PNG previews (corridor.png, racing_line.png); every
+# data artifact is written without it.
+matplotlib>=3.7

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>kart_map2d</name>
+  <version>1.0.0</version>
+  <description>
+    Standalone 2D (flat) mapping + autonomous drive stack for the Maveric
+    go-kart: drivable/obstacle evidence grid, corridor, racing line, loop
+    closure, map packages, live mapping node, map-relative localization,
+    pure-pursuit controller and safety layer. Camera-agnostic, dedicated-IMU
+    only, ROS 2 Humble / JetPack 6 / Python 3.10 / numpy&lt;2.
+  </description>
+  <maintainer email="26alladat@gmail.com">Maveric kart team</maintainer>
+  <license>Proprietary</license>
+
+  <exec_depend>rclpy</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>nav_msgs</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <exec_depend>std_srvs</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>ackermann_msgs</exec_depend>
+  <exec_depend>ros2launch</exec_depend>
+  <!-- bag replay testing (ros2 bag play into the node) -->
+  <exec_depend>rosbag2_transport</exec_depend>
+  <exec_depend>rosbag2_storage_default_plugins</exec_depend>
+  <!-- python deps (pip on the Orin: requirements/orin-base.txt mirrors these) -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-scipy</exec_depend>
+  <exec_depend>python3-yaml</exec_depend>
+
+  <test_depend>python3-pytest</test_depend>
+
+  <export>
+    <build_type>ament_python</build_type>
+  </export>
+</package>

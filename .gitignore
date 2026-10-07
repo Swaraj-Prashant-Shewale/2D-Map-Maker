@@ -1,0 +1,22 @@
+# kart_map2d - keep recordings, local artifacts and environments out of Git.
+inputs/
+outputs/
+results/
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+guide/
+
+# Recordings and local credentials must stay local regardless of location.
+*.db3
+*.db3-*
+*.mcap
+.env
+.env.*
+!.env.example
+*.pem
+*.key
